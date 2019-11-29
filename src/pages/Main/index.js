@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { FaGithub, FaPlus, FaSpinner } from 'react-icons/fa';
-import { Container, Form, SubmitButton } from './styles';
+import { Container, Form, SubmitButton, List } from './styles';
 
 import api from '../../services/api';
 
@@ -41,7 +41,7 @@ export default class Main extends Component {
   };
 
   render() {
-    const { newRepo, loading } = this.state;
+    const { newRepo, loading, repositories } = this.state;
 
     return (
       <Container>
@@ -62,6 +62,15 @@ export default class Main extends Component {
             {loading ? <FaSpinner /> : <FaPlus />}
           </SubmitButton>
         </Form>
+
+        <List>
+          {repositories.map(repo => (
+            <li key={repo.name}>
+              <span>{repo.name}</span>
+              <a href="/">Ver detalhes</a>
+            </li>
+          ))}
+        </List>
       </Container>
     );
   }
