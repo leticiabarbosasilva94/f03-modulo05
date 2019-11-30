@@ -4,27 +4,6 @@ export const Title = styled.h1`
   color: #fff;
 `;
 
-export const Container = styled.div`
-  max-width: 700px;
-  margin: 50px auto;
-  background: #fff;
-  padding: 30px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-  border-radius: 5px;
-
-  h1 {
-    font-size: 20px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-
-  svg {
-    margin-right: 10px;
-  }
-`;
-
 export const Form = styled.form`
   display: flex;
   flex-direction: row;
@@ -37,7 +16,10 @@ export const Form = styled.form`
     align-items: center;
     padding: 0 15px;
     height: 50px;
-    border: 1px solid #ccc;
+    border: 1px solid
+      ${props => {
+        return props.error ? 'red' : '#ccc';
+      }};
     font-size: 18px;
     border-radius: 4px;
   }

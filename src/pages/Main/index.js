@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { FaGithub, FaPlus, FaSpinner } from 'react-icons/fa';
-import { Container, Form, SubmitButton, List } from './styles';
+import { Link } from 'react-router-dom';
+import Container from '../../components/Container';
+import { Form, SubmitButton, List } from './styles';
 
 import api from '../../services/api';
 
@@ -9,7 +11,23 @@ export default class Main extends Component {
     newRepo: '',
     repositories: [],
     loading: false,
+    error: false,
   };
+
+  componentDidMount() {
+    const repositories = localStorage.getItem('repositories');
+
+    if (!repositories) return;
+    this.setState({ repositories: JSON.parse(repositories) });
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { repositories } = this.state;
+
+    if (repositories === prevState.repositories) return;
+
+    localStorage.setItem('repositories', JSON.stringify(repositories));
+  }
 
   handleInputChange = e => {
     this.setState({ newRepo: e.target.value });
@@ -22,6 +40,19 @@ export default class Main extends Component {
     const { newRepo, repositories } = this.state;
 
     try {
+      const existingRepos = repositories.filter(repos => {
+        return repos.name === newRepo;
+      });
+
+      if (existingRepos.length > 0) {
+        throw new Error('Repositório duplicado');
+        // this.setState({
+        //   loading: false,
+        //   error: true,
+        // });
+        // return;
+      }
+
       const response = await api.get(`/repos/${newRepo}`);
 
       const data = {
@@ -32,16 +63,18 @@ export default class Main extends Component {
         repositories: [...repositories, data],
         newRepo: '',
         loading: false,
+        error: false,
       });
     } catch {
       this.setState({
         loading: false,
+        error: true,
       });
     }
   };
 
   render() {
-    const { newRepo, loading, repositories } = this.state;
+    const { newRepo, loading, repositories, error } = this.state;
 
     return (
       <Container>
@@ -50,7 +83,7 @@ export default class Main extends Component {
           Repositórios
         </h1>
 
-        <Form onSubmit={this.handleSubmit}>
+        <Form onSubmit={this.handleSubmit} error={Number(error)}>
           <input
             onChange={this.handleInputChange}
             value={newRepo}
@@ -67,7 +100,9 @@ export default class Main extends Component {
           {repositories.map(repo => (
             <li key={repo.name}>
               <span>{repo.name}</span>
-              <a href="/">Ver detalhes</a>
+              <Link to={`/repository/${encodeURIComponent(repo.name)}`}>
+                Ver detalhes
+              </Link>
             </li>
           ))}
         </List>
